@@ -1,0 +1,8 @@
+import Link from "next/link";
+import type { StoreSettings } from "@/types";
+
+const legal = [["Preguntas frecuentes", "/preguntas-frecuentes"], ["Envíos", "/envios"], ["Cambios y devoluciones", "/cambios-devoluciones"], ["Privacidad", "/privacidad"], ["Términos", "/terminos"]];
+
+export function Footer({ settings }: { settings: StoreSettings | null }) {
+  return <footer className="bg-[#12110f] text-white"><div className="container-page grid gap-12 py-14 md:grid-cols-[1.4fr_1fr_1fr]"><div><p className="display text-4xl">MJ <span className="text-[var(--gold-soft)]">Vault</span></p><p className="mt-4 max-w-sm text-sm leading-7 text-white/65">Más que moda, tu esencia. Compra online y recibe tu pedido con atención personalizada.</p><p className="eyebrow mt-7 text-[var(--gold-soft)]">Tienda 100% virtual</p></div><div><p className="eyebrow mb-5 text-white/45">Explora</p><nav className="grid gap-3 text-sm"><Link href="/tienda">Tienda</Link><Link href="/nosotros">Nosotros</Link><Link href="/contacto">Contacto</Link></nav></div><div><p className="eyebrow mb-5 text-white/45">Información</p><nav className="grid gap-3 text-sm">{legal.map(([label, href]) => <Link key={href} href={href}>{label}</Link>)}</nav></div></div><div className="container-page flex flex-col gap-3 border-t border-white/15 py-5 text-xs text-white/50 md:flex-row md:justify-between"><span>© {new Date().getFullYear()} MJ Vault</span><div className="flex gap-5">{settings?.instagram_url && <a href={settings.instagram_url} target="_blank" rel="noreferrer">Instagram</a>}{settings?.tiktok_url && <a href={settings.tiktok_url} target="_blank" rel="noreferrer">TikTok</a>}</div></div></footer>;
+}

@@ -1,0 +1,5 @@
+import { ContentPage } from "@/components/store/content-page";
+import { getSettings } from "@/lib/data";
+import { publicEnv } from "@/lib/env";
+export const dynamic = "force-dynamic";
+export default async function Page() { const settings = await getSettings(); const whatsapp = settings?.whatsapp_number || publicEnv.whatsappNumber; return <ContentPage eyebrow="Hablemos" title="Contacto"><p>Recibe atención personalizada para resolver preguntas sobre productos, disponibilidad y pedidos.</p>{whatsapp ? <a className="button-primary" href={`https://wa.me/${String(whatsapp).replace(/\D/g,"")}`} target="_blank" rel="noreferrer">Escribir por WhatsApp</a> : <p className="border hairline p-4 text-[var(--ink)]">El número de atención se publicará próximamente.</p>}{settings?.contact_email && <p>Correo: <a className="text-[var(--ink)] underline" href={`mailto:${settings.contact_email}`}>{settings.contact_email}</a></p>}<p className="eyebrow text-[var(--gold)]">Tienda 100% virtual</p></ContentPage>; }

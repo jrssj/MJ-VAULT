@@ -1,0 +1,2 @@
+import Link from "next/link";
+export default function NotFound() { return <main className="container-page grid min-h-[60vh] place-content-center text-center"><p className="eyebrow text-[var(--gold)]">Producto no disponible</p><h1 className="display mt-3 text-5xl">Esta pieza ya no está aquí</h1><p className="muted mt-3">Explora el catálogo para descubrir otras opciones.</p><Link className="button-primary mx-auto mt-7" href="/tienda">Volver a la tienda</Link></main>; }

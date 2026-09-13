@@ -1,0 +1,5 @@
+"use client";
+import { useState } from "react";
+import { Trash2, X } from "lucide-react";
+import { deleteCategoryAction } from "@/app/admin/actions";
+export function CategoryDelete({id,name}:{id:string;name:string}) { const [open,setOpen]=useState(false); return <><button type="button" className="p-2 text-[var(--danger)]" onClick={()=>setOpen(true)} aria-label={`Eliminar ${name}`}><Trash2 size={17}/></button>{open&&<div className="modal-open fixed inset-0 z-50 grid place-items-center bg-black/45 p-4"><div role="dialog" aria-modal="true" className="w-full max-w-md bg-[var(--paper)] p-6"><div className="flex justify-between"><h2 className="display text-3xl">Eliminar categoría</h2><button onClick={()=>setOpen(false)}><X/></button></div><p className="muted mt-4 text-sm">Los productos conservarán su información, pero quedarán sin esta categoría.</p><div className="mt-7 grid grid-cols-2 gap-3"><button className="button-secondary" onClick={()=>setOpen(false)}>Conservar</button><form action={deleteCategoryAction.bind(null,id)}><button className="button-primary w-full bg-[var(--danger)] border-[var(--danger)]">Eliminar</button></form></div></div></div>}</>; }

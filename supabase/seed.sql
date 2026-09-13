@@ -1,0 +1,2 @@
+-- El catálogo inicial ya está incluido en la migración para que cada entorno
+-- comience con los productos reales de las imágenes proporcionadas.
