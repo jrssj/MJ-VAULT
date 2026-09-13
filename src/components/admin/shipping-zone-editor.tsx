@@ -67,7 +67,7 @@ export function ShippingZoneEditor({ zone }: { zone?: ShippingZone }) {
               </div>
 
               <div className="field">
-                <label htmlFor="zone-price">Tarifa USD</label>
+                <label htmlFor="zone-price">Tarifa en MXN ($)</label>
                 <input
                   id="zone-price"
                   name="price"
@@ -76,14 +76,14 @@ export function ShippingZoneEditor({ zone }: { zone?: ShippingZone }) {
                   step="1"
                   required
                   className="input"
-                  placeholder="15"
-                  defaultValue={zone?.price ?? 15}
+                  placeholder="150"
+                  defaultValue={zone?.price ?? 150}
                 />
               </div>
 
               <div className="field">
                 <label htmlFor="zone-free">
-                  Envío gratis a partir de (opcional, USD)
+                  Envío gratis a partir de (opcional, en MXN $)
                 </label>
                 <input
                   id="zone-free"

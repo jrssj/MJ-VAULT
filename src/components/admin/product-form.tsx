@@ -61,6 +61,81 @@ export function ProductForm({
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
 
+  // Conversión de moneda (USD -> MXN)
+  const [exchangeRate, setExchangeRate] = useState<number>(20);
+  const [priceUsd, setPriceUsd] = useState<string>(() => {
+    if (product?.price) {
+      return (product.price / 20).toFixed(2).replace(/\.00$/, "");
+    }
+    return "";
+  });
+  const [priceMxn, setPriceMxn] = useState<string>(() => {
+    return product?.price ? String(product.price) : "";
+  });
+
+  const [compareUsd, setCompareUsd] = useState<string>(() => {
+    if (product?.compare_at_price) {
+      return (product.compare_at_price / 20).toFixed(2).replace(/\.00$/, "");
+    }
+    return "";
+  });
+  const [compareMxn, setCompareMxn] = useState<string>(() => {
+    return product?.compare_at_price ? String(product.compare_at_price) : "";
+  });
+
+  const handlePriceUsdChange = (val: string, rate = exchangeRate) => {
+    setPriceUsd(val);
+    const num = parseFloat(val);
+    if (!isNaN(num) && num >= 0) {
+      setPriceMxn(String(Math.round(num * rate)));
+    } else {
+      setPriceMxn("");
+    }
+  };
+
+  const handlePriceMxnChange = (val: string, rate = exchangeRate) => {
+    setPriceMxn(val);
+    const num = parseFloat(val);
+    if (!isNaN(num) && num >= 0 && rate > 0) {
+      setPriceUsd((num / rate).toFixed(2).replace(/\.00$/, ""));
+    } else {
+      setPriceUsd("");
+    }
+  };
+
+  const handleCompareUsdChange = (val: string, rate = exchangeRate) => {
+    setCompareUsd(val);
+    const num = parseFloat(val);
+    if (!isNaN(num) && num >= 0) {
+      setCompareMxn(String(Math.round(num * rate)));
+    } else {
+      setCompareMxn("");
+    }
+  };
+
+  const handleCompareMxnChange = (val: string, rate = exchangeRate) => {
+    setCompareMxn(val);
+    const num = parseFloat(val);
+    if (!isNaN(num) && num >= 0 && rate > 0) {
+      setCompareUsd((num / rate).toFixed(2).replace(/\.00$/, ""));
+    } else {
+      setCompareUsd("");
+    }
+  };
+
+  const handleRateChange = (newRateVal: string) => {
+    const r = parseFloat(newRateVal) || 20;
+    setExchangeRate(r);
+    if (priceUsd) {
+      const num = parseFloat(priceUsd);
+      if (!isNaN(num)) setPriceMxn(String(Math.round(num * r)));
+    }
+    if (compareUsd) {
+      const num = parseFloat(compareUsd);
+      if (!isNaN(num)) setCompareMxn(String(Math.round(num * r)));
+    }
+  };
+
   const upload = async (files: FileList | null) => {
     if (!files?.length) return;
     setUploading(true);
@@ -359,73 +434,164 @@ export function ProductForm({
         </section>
 
         <aside className="space-y-6">
-          <div className="border hairline bg-[var(--paper)] p-5">
-            <h2 className="display mb-5 text-3xl">Venta</h2>
+          <div className="border hairline bg-[var(--paper)] p-5 space-y-4">
+            <div className="flex items-center justify-between border-b hairline pb-3">
+              <div>
+                <h2 className="display text-3xl">Precios</h2>
+                <p className="muted text-xs mt-0.5">Conversión automática USD a MXN</p>
+              </div>
+              <div className="flex items-center gap-1.5 bg-stone-100 px-2.5 py-1 text-xs rounded">
+                <span className="text-stone-500">1 USD =</span>
+                <input
+                  type="number"
+                  step="0.5"
+                  min="1"
+                  value={exchangeRate}
+                  onChange={(e) => handleRateChange(e.target.value)}
+                  className="w-14 bg-white border hairline px-1 py-0.5 text-center font-semibold text-stone-900 rounded"
+                  title="Tasa de cambio USD a MXN"
+                />
+                <span className="font-semibold text-stone-700">MXN</span>
+              </div>
+            </div>
+
             <div className="grid gap-4">
-              <div className="field">
-                <label htmlFor="price">Precio USD</label>
-                <input
-                  id="price"
-                  name="price"
-                  type="number"
-                  min="0"
-                  step="1"
-                  required
-                  className="input"
-                  defaultValue={product?.price ?? ""}
-                />
+              {/* Precio Principal */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold uppercase tracking-wider text-stone-700">
+                  Precio de venta *
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="field">
+                    <span className="text-[11px] text-stone-500 mb-1 block">En Dólares (USD)</span>
+                    <div className="relative">
+                      <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-stone-400 text-sm">$</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="3.25"
+                        value={priceUsd}
+                        onChange={(e) => handlePriceUsdChange(e.target.value)}
+                        className="input pl-6 text-sm"
+                      />
+                    </div>
+                  </div>
+                  <div className="field">
+                    <span className="text-[11px] font-semibold text-emerald-800 mb-1 block">Final Tienda (MXN)</span>
+                    <div className="relative">
+                      <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-stone-400 text-sm">$</span>
+                      <input
+                        id="price"
+                        name="price"
+                        type="number"
+                        min="0"
+                        step="1"
+                        required
+                        placeholder="65"
+                        value={priceMxn}
+                        onChange={(e) => handlePriceMxnChange(e.target.value)}
+                        className="input pl-6 font-bold text-stone-900 bg-emerald-50/40 border-emerald-300"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <p className="text-[11px] text-stone-500">
+                  {priceMxn ? `El cliente verá $${priceMxn} MXN en la tienda.` : "Ingresa en dólares y se calcula automáticamente en pesos."}
+                </p>
               </div>
-              <div className="field">
-                <label htmlFor="compare_at_price">Precio anterior</label>
-                <input
-                  id="compare_at_price"
-                  name="compare_at_price"
-                  type="number"
-                  min="0"
-                  step="1"
-                  className="input"
-                  defaultValue={product?.compare_at_price ?? ""}
-                />
+
+              {/* Precio Anterior / Oferta */}
+              <div className="space-y-1.5 pt-2 border-t hairline">
+                <label className="text-xs font-semibold uppercase tracking-wider text-stone-700">
+                  Precio anterior (oferta tachada)
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="field">
+                    <span className="text-[11px] text-stone-500 mb-1 block">En USD</span>
+                    <div className="relative">
+                      <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-stone-400 text-sm">$</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="4.00"
+                        value={compareUsd}
+                        onChange={(e) => handleCompareUsdChange(e.target.value)}
+                        className="input pl-6 text-sm"
+                      />
+                    </div>
+                  </div>
+                  <div className="field">
+                    <span className="text-[11px] text-stone-500 mb-1 block">En MXN</span>
+                    <div className="relative">
+                      <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-stone-400 text-sm">$</span>
+                      <input
+                        id="compare_at_price"
+                        name="compare_at_price"
+                        type="number"
+                        min="0"
+                        step="1"
+                        placeholder="80"
+                        value={compareMxn}
+                        onChange={(e) => handleCompareMxnChange(e.target.value)}
+                        className="input pl-6 text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="field">
-                <label htmlFor="cost">Costo opcional</label>
-                <input
-                  id="cost"
-                  name="cost"
-                  type="number"
-                  min="0"
-                  step="1"
-                  className="input"
-                  defaultValue={product?.cost ?? ""}
-                />
+
+              {/* Costo opcional */}
+              <div className="space-y-1.5 pt-2 border-t hairline">
+                <label htmlFor="cost" className="text-xs font-semibold uppercase tracking-wider text-stone-700">
+                  Costo interno opcional (en MXN)
+                </label>
+                <div className="relative">
+                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-stone-400 text-sm">$</span>
+                  <input
+                    id="cost"
+                    name="cost"
+                    type="number"
+                    min="0"
+                    step="1"
+                    className="input pl-6 text-sm"
+                    placeholder="En MXN"
+                    defaultValue={product?.cost ?? ""}
+                  />
+                </div>
               </div>
-              <div className="field">
-                <label htmlFor="sku">SKU general</label>
-                <input id="sku" name="sku" className="input" defaultValue={product?.sku ?? ""} />
-              </div>
-              <div className="field">
-                <label htmlFor="stock">Stock general</label>
-                <input
-                  id="stock"
-                  name="stock"
-                  type="number"
-                  min="0"
-                  step="1"
-                  className="input"
-                  defaultValue={product?.stock ?? 1}
-                />
-              </div>
-              <div className="field">
-                <label htmlFor="low_stock_threshold">Alerta de poco stock</label>
-                <input
-                  id="low_stock_threshold"
-                  name="low_stock_threshold"
-                  type="number"
-                  min="0"
-                  step="1"
-                  className="input"
-                  defaultValue={product?.low_stock_threshold ?? 3}
-                />
+
+              {/* SKU & Inventario */}
+              <div className="pt-2 border-t hairline space-y-4">
+                <div className="field">
+                  <label htmlFor="sku">SKU general</label>
+                  <input id="sku" name="sku" className="input" defaultValue={product?.sku ?? ""} />
+                </div>
+                <div className="field">
+                  <label htmlFor="stock">Stock general</label>
+                  <input
+                    id="stock"
+                    name="stock"
+                    type="number"
+                    min="0"
+                    step="1"
+                    className="input"
+                    defaultValue={product?.stock ?? 1}
+                  />
+                </div>
+                <div className="field">
+                  <label htmlFor="low_stock_threshold">Alerta de poco stock</label>
+                  <input
+                    id="low_stock_threshold"
+                    name="low_stock_threshold"
+                    type="number"
+                    min="0"
+                    step="1"
+                    className="input"
+                    defaultValue={product?.low_stock_threshold ?? 3}
+                  />
+                </div>
               </div>
             </div>
           </div>

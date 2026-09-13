@@ -64,13 +64,16 @@ Si el producto tiene diferentes presentaciones (por ejemplo, múltiples aromas d
    - **Stock**: Cantidad disponible de esa variante específica.
 3. El cliente podrá seleccionar su presentación favorita directamente desde la página del producto.
 
-#### D. Precios e Inventario General
-- **Precio USD**: Precio de venta al público en dólares estadounidenses (número entero, ej. `65` o `15`).
-- **Precio anterior**: Opcional. Si lo completas (ejemplo: `80`), la tienda mostrará el precio original tachado y calculará automáticamente la etiqueta de descuento.
-- **Costo opcional**: Para tu control financiero interno (nunca es visible para los clientes).
-- **SKU general**: Código de referencia de bodega.
-- **Stock general**: Cantidad total en inventario (se usa si el producto no tiene variantes).
-- **Alerta de poco stock**: Número mínimo de unidades a partir del cual el sistema te avisará que se está agotando.
+#### D. Precios y Conversión Automática (USD a MXN)
+El sistema cuenta con una **calculadora de divisas en tiempo real**:
+- **Precio en Dólares (USD)**: Ingresas el valor en dólares al que compras o cotizas el producto en EE. UU. (ejemplo: `3.25`).
+- **Tasa de cambio (USD a MXN)**: Viene predeterminada en `20.00` (1 USD = $20 MXN), pero puedes ajustarla en el momento si el dólar cambia.
+- **Precio Final en Tienda (MXN)**: Se calcula automáticamente en pesos mexicanos (ejemplo: `3.25 * 20 = $65 MXN`).
+- **Edición bidireccional**: Si prefieres escribir directamente el precio en pesos (ej. `$65`), el campo de dólares se recalcula solo.
+- **Precio anterior (oferta)**: También permite ingresar en USD y auto-calcula el precio tachado en MXN (ej. `$4.00 USD` -> `$80 MXN`).
+- **Lo que ve el cliente**: Los compradores en la tienda pública siempre verán los precios finales en **Pesos Mexicanos (MXN)** (ejemplo: `$65 MXN`, `$680 MXN`).
+- **Costo interno opcional**: Para tu control financiero privado en MXN (nunca visible para clientes).
+- **SKU e Inventario**: Código de bodega y cantidad disponible con alerta de poco stock.
 
 #### E. Organización y Visibilidad
 - **Categoría**: Selecciona a qué categoría pertenece (Belleza, Cuidado Personal, etc.).
@@ -120,7 +123,7 @@ Al dar clic sobre cualquier pedido en la lista, accederás a su expediente:
 - **Ubicación de entrega**: País, Estado/Departamento, Ciudad, Dirección completa, Referencia/ZIP y notas particulares.
 - **Desglose de compra**: Productos solicitados, variantes elegidas, cantidades y subtotales.
 - **Tarifa de envío aplicada**: Costo de flete o confirmación de *Envío Gratis*.
-- **Total a liquidar en USD**.
+- **Total a liquidar en Pesos Mexicanos (MXN)**.
 
 ### 5.3. Estados del Pedido
 En la parte superior derecha de cada pedido puedes actualizar su estado según avance la operación:
@@ -141,8 +144,8 @@ En la ficha del pedido encontrarás un botón para abrir WhatsApp directamente c
 En la sección **Envíos** (`/admin/envios`):
 Puedes definir las tarifas de entrega según la región geográfica de tus clientes:
 - **Nombre de la zona**: Ejemplo: *Estados Unidos Continental*, *México Nacional*, *Colombia Nacional*, o *Envío Local*.
-- **Tarifa plana (USD)**: Costo fijo de envío para esa zona (ejemplo: `$8` o `$15`).
-- **Umbral de Envío Gratis**: Monto mínimo de compra a partir del cual el costo de flete se vuelve automáticamente `$0` (ejemplo: si colocas `$100`, las compras de $100 USD o más no pagarán envío).
+- **Tarifa en Pesos Mexicanos (MXN)**: Costo fijo de envío para esa zona (ejemplo: `$150 MXN` o `$250 MXN`).
+- **Umbral de Envío Gratis**: Monto mínimo de compra a partir del cual el costo de flete se vuelve automáticamente `$0` (ejemplo: si colocas `$1,500 MXN`, las compras de $1,500 MXN o más no pagarán envío).
 - **Activar / Desactivar**: Si una zona no tiene cobertura temporal, puedes apagarla con un clic sin tener que eliminarla.
 
 ---
@@ -151,7 +154,7 @@ Puedes definir las tarifas de entrega según la región geográfica de tus clien
 
 En la sección **Configuración** (`/admin/configuracion`):
 - **Teléfono de WhatsApp**: Número oficial internacional donde se reciben las órdenes (actualmente configurado en `13039056030`).
-- **Moneda de la tienda**: Toda la plataforma opera en dólares estadounidenses (`USD`).
+- **Moneda de la tienda**: Toda la vitrina comercial y transacciones operan en **Pesos Mexicanos (MXN)**.
 - **Enlaces de redes sociales**: Canales oficiales de contacto y soporte.
 
 ---

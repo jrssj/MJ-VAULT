@@ -18,7 +18,7 @@ function getCartItemKey(productId: string, variantId: string | null): string {
   return `${productId}:${variantId ?? "base"}`;
 }
 
-test("cart calculates subtotal correctly in USD integers", () => {
+test("cart calculates subtotal correctly in MXN integers", () => {
   const items: CartItem[] = [
     {
       key: "prod1:var1",

@@ -75,7 +75,7 @@ test("checkoutSchema rejects invalid phone numbers", () => {
   assert.equal(checkoutSchema.safeParse(invalidPhone).success, false);
 });
 
-test("productSchema enforces non-negative integer prices in USD", () => {
+test("productSchema enforces non-negative integer prices in MXN", () => {
   const validProduct = {
     name: "Vestido Seda",
     slug: "vestido-seda",

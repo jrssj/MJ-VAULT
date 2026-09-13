@@ -82,7 +82,7 @@ function generateWhatsAppMessage({
     .join("\n");
 }
 
-test("whatsapp message format contains NO emojis and formats currency in USD", () => {
+test("whatsapp message format contains NO emojis and formats currency in MXN", () => {
   const msg = generateWhatsAppMessage({
     orderNumber: "MJ-000123",
     customerName: "Camila Torres",
@@ -112,9 +112,9 @@ test("whatsapp message format contains NO emojis and formats currency in USD", (
   assert.equal(emojiRegex.test(msg), false, "Message must not contain any emoji");
 
   assert.ok(msg.includes("Pedido: #MJ-000123"));
-  assert.ok(msg.includes("Subtotal: $230.00"));
-  assert.ok(msg.includes("Envío (Bucaramanga): $15.00"));
-  assert.ok(msg.includes("Total: $245.00"));
+  assert.ok(msg.includes("Subtotal: $230 MXN"));
+  assert.ok(msg.includes("Envío (Bucaramanga): $15 MXN"));
+  assert.ok(msg.includes("Total: $245 MXN"));
 });
 
 test("whatsapp message encodes properly for wa.me URL", () => {
