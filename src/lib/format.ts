@@ -1,9 +1,9 @@
-export function formatCurrency(value: number) {
-  return new Intl.NumberFormat("es-CO", {
+export function formatCurrency(value: number | null | undefined): string {
+  const amount = typeof value === "number" && !Number.isNaN(value) ? value : 0;
+  return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  }).format(value);
+    currency: "USD",
+  }).format(amount);
 }
 
 export function formatDate(value: string) {

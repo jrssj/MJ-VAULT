@@ -6,9 +6,12 @@ export const checkoutSchema = z.object({
   city: z.string().trim().min(2).max(80),
   department: z.string().trim().min(2).max(80),
   address: z.string().trim().min(5).max(180),
-  neighborhood: z.string().trim().min(2).max(100),
+  neighborhood: z.string().trim().max(100).optional().default("N/A"),
+  addressReference: z.string().trim().max(180).optional().default(""),
   notes: z.string().trim().max(500).optional().default(""),
   deliveryMethod: z.string().trim().max(80).optional().default("Envío a domicilio"),
+  shippingZoneId: z.string().uuid().nullable().optional(),
+  shippingZoneName: z.string().trim().max(100).nullable().optional(),
   items: z.array(z.object({
     productId: z.string().uuid(),
     variantId: z.string().uuid().nullable(),
@@ -46,3 +49,12 @@ export const categorySchema = z.object({
   active: z.boolean(),
   sort_order: z.number().int().min(0).max(9999),
 });
+
+export const shippingZoneSchema = z.object({
+  name: z.string().trim().min(2).max(100),
+  price: z.number().int().nonnegative(),
+  free_shipping_threshold: z.number().int().nonnegative().nullable().optional(),
+  active: z.boolean(),
+  sort_order: z.number().int().min(0).max(9999),
+});
+

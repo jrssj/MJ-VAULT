@@ -93,3 +93,51 @@ export type OrderStatus =
   | "ENVIADO"
   | "ENTREGADO"
   | "CANCELADO";
+
+export type ShippingZone = {
+  id: string;
+  name: string;
+  price: number;
+  free_shipping_threshold: number | null;
+  active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type OrderItem = {
+  id: string;
+  order_id: string;
+  product_id: string | null;
+  variant_id: string | null;
+  product_name_snapshot: string;
+  variant_snapshot: { size?: string | null; color?: string | null };
+  sku_snapshot: string | null;
+  image_snapshot: string | null;
+  quantity: number;
+  unit_price: number;
+  subtotal: number;
+  created_at: string;
+};
+
+export type Order = {
+  id: string;
+  order_number: string;
+  customer_name: string;
+  phone: string;
+  city: string;
+  department: string;
+  address: string;
+  neighborhood: string;
+  notes: string | null;
+  delivery_method: string;
+  subtotal: number;
+  shipping_cost: number;
+  shipping_zone_id: string | null;
+  shipping_zone_name: string | null;
+  total: number;
+  status: OrderStatus;
+  created_at: string;
+  updated_at: string;
+  order_items?: OrderItem[];
+};
