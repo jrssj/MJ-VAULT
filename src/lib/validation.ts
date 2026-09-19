@@ -37,7 +37,7 @@ export const productSchema = z.object({
   is_new: z.boolean(),
   on_sale: z.boolean(),
   images: z.array(z.object({ image_url: z.string().min(1), alt_text: z.string().max(180).nullable(), is_primary: z.boolean(), sort_order: z.number().int() })).max(12),
-  variants: z.array(z.object({ id: z.string().uuid().optional(), size: z.string().max(40).nullable(), color: z.string().max(60).nullable(), sku: z.string().min(1).max(80), stock: z.number().int().nonnegative(), active: z.boolean() })).max(200),
+  variants: z.array(z.object({ id: z.string().uuid().optional(), size: z.string().max(40).nullable(), color: z.string().max(60).nullable(), sku: z.string().min(1).max(80), stock: z.number().int().nonnegative(), active: z.boolean(), price: z.number().int().nonnegative().nullable().optional() })).max(200),
 });
 
 export const categorySchema = z.object({

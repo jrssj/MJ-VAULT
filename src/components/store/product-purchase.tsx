@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Minus, Plus, ShoppingBag } from "lucide-react";
 import type { Product } from "@/types";
+import { formatCurrency } from "@/lib/format";
 import { useCart } from "./cart-provider";
 
 export function ProductPurchase({ product }: { product: Product }) {
@@ -36,6 +37,11 @@ export function ProductPurchase({ product }: { product: Product }) {
         (!sizes.length || variant.size === size)
     );
   }, [variants, colors.length, sizes.length, color, size]);
+
+  const activePrice = selectedVariant?.price ?? product.price;
+  const hasVariantPrice = Boolean(selectedVariant?.price && selectedVariant.price !== product.price);
+  const isStorage = sizes.some((s) => /\b(gb|tb|mb)\b/i.test(s));
+  const sizeLabel = isStorage ? "Capacidad" : "Talla / Medida";
 
   const selectionComplete =
     !variants.length ||
@@ -72,7 +78,7 @@ export function ProductPurchase({ product }: { product: Product }) {
       slug: product.slug,
       name: product.name,
       image: image?.image_url ?? null,
-      price: product.price,
+      price: activePrice,
       quantity,
       size: selectedVariant?.size ?? null,
       color: selectedVariant?.color ?? null,
@@ -83,6 +89,16 @@ export function ProductPurchase({ product }: { product: Product }) {
   if (totalProductStock === 0) {
     return (
       <div className="space-y-4">
+        <div className="flex items-baseline gap-3">
+          <span className="text-3xl font-semibold tracking-tight text-[var(--ink)]">
+            {formatCurrency(product.price)}
+          </span>
+          {product.compare_at_price && (
+            <span className="text-base text-stone-400 line-through">
+              {formatCurrency(product.compare_at_price)}
+            </span>
+          )}
+        </div>
         <div className="border border-[var(--danger)] bg-red-50 p-4 text-center">
           <p className="text-sm font-bold tracking-wider text-[var(--danger)] uppercase">
             Producto agotado
@@ -104,6 +120,22 @@ export function ProductPurchase({ product }: { product: Product }) {
 
   return (
     <div className="space-y-6">
+      <div className="flex flex-wrap items-baseline gap-3">
+        <span className="text-3xl font-semibold tracking-tight text-[var(--ink)]">
+          {formatCurrency(activePrice)}
+        </span>
+        {product.compare_at_price && (
+          <span className="text-base text-stone-400 line-through">
+            {formatCurrency(product.compare_at_price)}
+          </span>
+        )}
+        {hasVariantPrice && (
+          <span className="text-[11px] font-medium tracking-wide uppercase px-2 py-0.5 rounded bg-amber-50 text-amber-900 border border-amber-200">
+            Precio para esta opción
+          </span>
+        )}
+      </div>
+
       {colors.length > 0 && (
         <fieldset>
           <legend className="eyebrow mb-3">Color</legend>
@@ -138,11 +170,15 @@ export function ProductPurchase({ product }: { product: Product }) {
 
       {sizes.length > 0 && (
         <fieldset>
-          <legend className="eyebrow mb-3">Talla</legend>
+          <legend className="eyebrow mb-3">{sizeLabel}</legend>
           <div className="flex flex-wrap gap-2">
             {sizes.map((value) => {
               const unavailable = isSizeUnavailable(value);
               const isSelected = size === value;
+              const matchingVariant = variants.find(
+                (v) => v.size === value && (!color || v.color === color)
+              );
+              const variantPrice = matchingVariant?.price;
               return (
                 <button
                   type="button"
@@ -152,15 +188,24 @@ export function ProductPurchase({ product }: { product: Product }) {
                     setQuantity(1);
                   }}
                   disabled={unavailable}
-                  className={`grid min-h-11 min-w-12 place-items-center border px-3 text-sm transition ${
+                  className={`flex items-center gap-2 min-h-11 border px-3.5 py-1 text-sm font-medium transition ${
                     isSelected
-                      ? "border-[var(--ink)] bg-[var(--ink)] text-white"
+                      ? "border-[var(--ink)] bg-[var(--ink)] text-white shadow-sm"
                       : unavailable
                       ? "cursor-not-allowed border-dashed opacity-40 line-through"
-                      : "hairline hover:border-[var(--ink)]"
+                      : "hairline hover:border-[var(--ink)] bg-white"
                   }`}
                 >
-                  {value}
+                  <span>{value}</span>
+                  {variantPrice && variantPrice !== product.price ? (
+                    <span
+                      className={`text-xs ${
+                        isSelected ? "text-stone-300" : "text-stone-500"
+                      }`}
+                    >
+                      ({formatCurrency(variantPrice)})
+                    </span>
+                  ) : null}
                 </button>
               );
             })}

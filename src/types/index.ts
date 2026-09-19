@@ -26,6 +26,7 @@ export type ProductVariant = {
   sku: string;
   stock: number;
   active: boolean;
+  price?: number | null;
 };
 
 export type Product = {

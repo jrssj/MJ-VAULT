@@ -71,3 +71,37 @@ test("cart generates unique keys distinguishing variants of the same product", (
   assert.equal(keyRed, "prod-123:var-red");
   assert.equal(keyBase, "prod-123:base");
 });
+
+test("cart correctly calculates subtotal when variants have distinct prices (e.g. storage capacities)", () => {
+  const items: CartItem[] = [
+    {
+      key: "phone:256gb",
+      productId: "phone",
+      variantId: "256gb",
+      slug: "smartphone-pro",
+      name: "Smartphone Pro",
+      image: null,
+      price: 18000,
+      quantity: 1,
+      size: "256 GB",
+      color: "Titanio",
+      maxStock: 5,
+    },
+    {
+      key: "phone:512gb",
+      productId: "phone",
+      variantId: "512gb",
+      slug: "smartphone-pro",
+      name: "Smartphone Pro",
+      image: null,
+      price: 22000,
+      quantity: 2,
+      size: "512 GB",
+      color: "Titanio",
+      maxStock: 4,
+    },
+  ];
+
+  assert.equal(calculateCartSubtotal(items), 18000 * 1 + 22000 * 2);
+  assert.equal(calculateCartCount(items), 3);
+});

@@ -9,7 +9,16 @@ import { slugify } from "@/lib/format";
 import type { Category, Product } from "@/types";
 
 type EditableImage = { image_url: string; alt_text: string | null; is_primary: boolean; sort_order: number };
-type EditableVariant = { id?: string; size: string | null; color: string | null; sku: string; stock: number; active: boolean };
+type EditableVariant = {
+  id?: string;
+  size: string | null;
+  color: string | null;
+  sku: string;
+  stock: number;
+  active: boolean;
+  price?: number | null;
+  price_usd?: string;
+};
 
 async function optimizeImage(file: File) {
   if (!file.type.startsWith("image/")) throw new Error("Selecciona un archivo de imagen.");
@@ -56,6 +65,8 @@ export function ProductForm({
       sku: v.sku,
       stock: v.stock,
       active: v.active,
+      price: v.price ?? null,
+      price_usd: v.price ? (v.price / 20).toFixed(2).replace(/\.00$/, "") : "",
     }))
   );
   const [uploading, setUploading] = useState(false);
@@ -134,6 +145,17 @@ export function ProductForm({
       const num = parseFloat(compareUsd);
       if (!isNaN(num)) setCompareMxn(String(Math.round(num * r)));
     }
+    setVariants((current) =>
+      current.map((v) => {
+        if (v.price_usd) {
+          const num = parseFloat(v.price_usd);
+          if (!isNaN(num) && num >= 0) {
+            return { ...v, price: Math.round(num * r) };
+          }
+        }
+        return v;
+      })
+    );
   };
 
   const upload = async (files: FileList | null) => {
@@ -178,7 +200,15 @@ export function ProductForm({
   const addVariant = () =>
     setVariants((current) => [
       ...current,
-      { size: null, color: null, sku: "", stock: 0, active: true },
+      {
+        size: null,
+        color: null,
+        sku: "",
+        stock: 0,
+        active: true,
+        price: null,
+        price_usd: "",
+      },
     ]);
 
   return (
@@ -355,78 +385,165 @@ export function ProductForm({
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="display text-3xl">Variantes</h2>
-                <p className="muted mt-2 text-xs">Crea combinaciones de aroma, talla o color con inventario propio.</p>
+                <p className="muted mt-2 text-xs">
+                  Crea combinaciones de capacidad, aroma, talla o color con precio y stock propio.
+                </p>
               </div>
               <button type="button" className="button-secondary" onClick={addVariant}>
                 <Plus size={16} />
-                Agregar
+                Agregar variante
               </button>
             </div>
             <div className="mt-6 space-y-3">
+              {variants.length > 0 && (
+                <div className="hidden lg:grid gap-3 px-4 py-2 text-xs font-semibold text-stone-500 uppercase tracking-wider grid-cols-[1.3fr_1fr_1.2fr_110px_130px_90px_40px]">
+                  <span>Capacidad / Talla</span>
+                  <span>Color</span>
+                  <span>SKU</span>
+                  <span>USD ($)</span>
+                  <span>MXN ($)</span>
+                  <span>Stock</span>
+                  <span></span>
+                </div>
+              )}
               {variants.map((variant, index) => (
                 <div
                   key={variant.id ?? index}
-                  className="grid gap-3 border hairline p-4 sm:grid-cols-[1fr_1fr_1.3fr_100px_auto]"
+                  className="grid gap-3 border hairline p-4 bg-white/50 rounded-sm lg:grid-cols-[1.3fr_1fr_1.2fr_110px_130px_90px_40px] items-center"
                 >
-                  <input
-                    className="input"
-                    placeholder="Aroma / Talla"
-                    aria-label="Aroma o talla"
-                    value={variant.size ?? ""}
-                    onChange={(e) =>
-                      setVariants((current) =>
-                        current.map((v, i) => (i === index ? { ...v, size: e.target.value || null } : v))
-                      )
-                    }
-                  />
-                  <input
-                    className="input"
-                    placeholder="Color"
-                    aria-label="Color"
-                    value={variant.color ?? ""}
-                    onChange={(e) =>
-                      setVariants((current) =>
-                        current.map((v, i) => (i === index ? { ...v, color: e.target.value || null } : v))
-                      )
-                    }
-                  />
-                  <input
-                    className="input"
-                    placeholder="SKU"
-                    aria-label="SKU de variante"
-                    required
-                    value={variant.sku}
-                    onChange={(e) =>
-                      setVariants((current) =>
-                        current.map((v, i) => (i === index ? { ...v, sku: e.target.value } : v))
-                      )
-                    }
-                  />
-                  <input
-                    className="input"
-                    type="number"
-                    min="0"
-                    aria-label="Stock"
-                    value={variant.stock}
-                    onChange={(e) =>
-                      setVariants((current) =>
-                        current.map((v, i) => (i === index ? { ...v, stock: Number(e.target.value) } : v))
-                      )
-                    }
-                  />
-                  <button
-                    type="button"
-                    className="p-3 text-[var(--danger)]"
-                    onClick={() => setVariants((current) => current.filter((_, i) => i !== index))}
-                    aria-label="Eliminar variante"
-                  >
-                    <Trash2 size={17} />
-                  </button>
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-medium text-stone-500 lg:hidden">Capacidad / Talla</label>
+                    <input
+                      className="input"
+                      placeholder="Ej. 256 GB, M, 100ml"
+                      aria-label="Aroma o talla"
+                      value={variant.size ?? ""}
+                      onChange={(e) =>
+                        setVariants((current) =>
+                          current.map((v, i) => (i === index ? { ...v, size: e.target.value || null } : v))
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-medium text-stone-500 lg:hidden">Color</label>
+                    <input
+                      className="input"
+                      placeholder="Ej. Titanio, Negro"
+                      aria-label="Color"
+                      value={variant.color ?? ""}
+                      onChange={(e) =>
+                        setVariants((current) =>
+                          current.map((v, i) => (i === index ? { ...v, color: e.target.value || null } : v))
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-medium text-stone-500 lg:hidden">SKU</label>
+                    <input
+                      className="input"
+                      placeholder="SKU variante"
+                      aria-label="SKU de variante"
+                      required
+                      value={variant.sku}
+                      onChange={(e) =>
+                        setVariants((current) =>
+                          current.map((v, i) => (i === index ? { ...v, sku: e.target.value } : v))
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-medium text-stone-500 lg:hidden">Precio USD ($)</label>
+                    <div className="relative">
+                      <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-stone-400">$</span>
+                      <input
+                        className="input pl-6"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="USD"
+                        aria-label="Precio USD"
+                        value={variant.price_usd ?? ""}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          const num = parseFloat(val);
+                          setVariants((current) =>
+                            current.map((v, i) => {
+                              if (i !== index) return v;
+                              if (!val) {
+                                return { ...v, price_usd: "", price: null };
+                              }
+                              const mxn = !isNaN(num) && num >= 0 ? Math.round(num * exchangeRate) : null;
+                              return { ...v, price_usd: val, price: mxn };
+                            })
+                          );
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-medium text-stone-500 lg:hidden">Precio MXN ($)</label>
+                    <div className="relative">
+                      <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-stone-400">$</span>
+                      <input
+                        className="input pl-6"
+                        type="number"
+                        min="0"
+                        placeholder={priceMxn ? `Base ($${priceMxn})` : "Base"}
+                        aria-label="Precio MXN"
+                        value={variant.price ?? ""}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          const num = parseFloat(val);
+                          setVariants((current) =>
+                            current.map((v, i) => {
+                              if (i !== index) return v;
+                              if (!val) {
+                                return { ...v, price: null, price_usd: "" };
+                              }
+                              const usd =
+                                !isNaN(num) && num >= 0 && exchangeRate > 0
+                                  ? (num / exchangeRate).toFixed(2).replace(/\.00$/, "")
+                                  : "";
+                              return { ...v, price: Math.round(num), price_usd: usd };
+                            })
+                          );
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-medium text-stone-500 lg:hidden">Stock</label>
+                    <input
+                      className="input"
+                      type="number"
+                      min="0"
+                      aria-label="Stock"
+                      value={variant.stock}
+                      onChange={(e) =>
+                        setVariants((current) =>
+                          current.map((v, i) => (i === index ? { ...v, stock: Number(e.target.value) } : v))
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="flex justify-end lg:justify-center">
+                    <button
+                      type="button"
+                      className="p-2.5 text-[var(--danger)] hover:bg-red-50 rounded transition-colors"
+                      onClick={() => setVariants((current) => current.filter((_, i) => i !== index))}
+                      aria-label="Eliminar variante"
+                    >
+                      <Trash2 size={17} />
+                    </button>
+                  </div>
                 </div>
               ))}
               {!variants.length && (
                 <p className="muted border border-dashed hairline p-6 text-center text-sm">
-                  Este producto usa un stock general. Agrega variantes si cambia por aroma, talla o color.
+                  Este producto usa un stock general. Agrega variantes si cambia por capacidad, aroma, talla o color.
                 </p>
               )}
             </div>

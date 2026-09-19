@@ -131,3 +131,66 @@ test("categorySchema validates category slug and name", () => {
   };
   assert.equal(categorySchema.safeParse(invalidSlug).success, false);
 });
+
+test("productSchema accepts variants with custom price or null price", () => {
+  const productWithVariantPrices = {
+    name: "Smartphone Pro",
+    slug: "smartphone-pro",
+    price: 18000,
+    stock: 10,
+    low_stock_threshold: 3,
+    active: true,
+    featured: false,
+    is_new: true,
+    on_sale: false,
+    images: [],
+    variants: [
+      {
+        sku: "PHONE-256GB",
+        size: "256 GB",
+        color: "Titanio",
+        stock: 5,
+        active: true,
+        price: null,
+      },
+      {
+        sku: "PHONE-512GB",
+        size: "512 GB",
+        color: "Titanio",
+        stock: 3,
+        active: true,
+        price: 22000,
+      },
+      {
+        sku: "PHONE-1TB",
+        size: "1 TB",
+        color: "Titanio",
+        stock: 2,
+        active: true,
+        price: 26000,
+      },
+    ],
+  };
+  const result = productSchema.safeParse(productWithVariantPrices);
+  assert.equal(result.success, true);
+  if (result.success) {
+    assert.equal(result.data.variants[0].price, null);
+    assert.equal(result.data.variants[1].price, 22000);
+    assert.equal(result.data.variants[2].price, 26000);
+  }
+
+  const invalidVariantPrice = {
+    ...productWithVariantPrices,
+    variants: [
+      {
+        sku: "PHONE-BAD",
+        size: "256 GB",
+        color: "Titanio",
+        stock: 5,
+        active: true,
+        price: -500,
+      },
+    ],
+  };
+  assert.equal(productSchema.safeParse(invalidVariantPrice).success, false);
+});
