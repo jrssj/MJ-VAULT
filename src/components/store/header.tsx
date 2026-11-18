@@ -24,6 +24,7 @@ export function Header({
   const leftLinks = [
     ["Inicio", "/"],
     ["Tienda", "/tienda"],
+    ["Ofertas", "/ofertas"],
     ...leftCategoryLinks,
   ] as const;
 
@@ -129,6 +130,13 @@ export function Header({
                 className="display border-b hairline py-3 text-3xl"
               >
                 Tienda
+              </Link>
+              <Link
+                href="/ofertas"
+                onClick={() => setMenuOpen(false)}
+                className="display border-b hairline py-3 text-3xl"
+              >
+                Ofertas
               </Link>
               {mainCategories.map((cat) => (
                 <Link

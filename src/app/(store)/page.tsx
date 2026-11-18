@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Headphones, PackageCheck, ShieldCheck, Sparkles } from "lucide-react";
 import { getCategories, getProducts, getSettings } from "@/lib/data";
 import { ProductGrid } from "@/components/store/product-grid";
+import { OffersPreview } from "@/components/store/offers-preview";
 
 export const dynamic = "force-dynamic";
 
@@ -67,6 +68,8 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      <OffersPreview />
 
       {/* Categorías Seleccionadas */}
       <section className="container-page py-16 md:py-24">
