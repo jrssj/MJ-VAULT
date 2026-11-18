@@ -41,7 +41,7 @@ export default async function OffersPage() {
                 const href = whatsapp ? `https://wa.me/${whatsapp}?text=${encodeURIComponent(message)}` : "/contacto";
                 return (
                   <article key={offer.name} className="flex flex-col border hairline bg-[var(--paper)] p-6">
-                    {offer.image && <div className="relative mb-5 aspect-[4/3]"><Image src={offer.image} alt={offer.name} unoptimized={offer.image.startsWith("https://")} fill sizes="(max-width: 640px) 90vw, 33vw" className="object-contain" /></div>}
+                    {offer.image && <div className="relative mb-5 aspect-[4/3]"><Image src={offer.image} alt={offer.name} fill sizes="(max-width: 640px) 90vw, 33vw" className="object-contain" /></div>}
                     <h3 className="text-lg font-semibold leading-6">{offer.name}</h3>
                     <p className="muted mt-2 text-sm">{offer.detail}</p>
                     <p className="mt-5 text-2xl font-semibold text-[#702c3b]">{formatCurrency(offer.price)}</p>
